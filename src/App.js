@@ -1,25 +1,20 @@
-import logo from './logo.svg';
+import {Switch, Route} from 'react-router-dom'
+import LoginForm from '../src/components/LoginForm'
+import RegisterForm from '../src/components/RegisterForm'
+import NxtTodo from '../src/components/NxtTodo'
+import ProtectedRoute from '../src/components/ProtectedRoute'
+import TodoForm from '../src/components/TodoForm'
+
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => (
+  <Switch>
+    <Route path='/login' component={LoginForm} />
+    <Route path='/register' component={RegisterForm} />
+    <ProtectedRoute exact path='/' component={NxtTodo} />
+    <ProtectedRoute exact path='/new' component={TodoForm} />
+  </Switch>
+)
 
-export default App;
+export default App

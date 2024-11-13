@@ -49,7 +49,6 @@ class RegisterForm extends Component {
   }
 
   onSubmitFailure = errorMsg => {
-    console.log('err occ')
     this.setState({showSubmitError: true, errorMsg})
   }
 
@@ -57,7 +56,7 @@ class RegisterForm extends Component {
     event.preventDefault()
     const {username, email, password} = this.state
     const userDetails = {id: uuidv4(), username, email, password}
-    const registerUrl = 'http://localhost:8080/register'
+    const registerUrl = 'https://todo-app-backend-2zeu.onrender.com/register'
     const options = {
       method: 'POST',
       headers: {

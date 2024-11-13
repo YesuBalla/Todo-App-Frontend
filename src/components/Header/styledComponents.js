@@ -13,7 +13,8 @@ export const NavHeader = styled.nav`
 `
 
 export const AppLogo = styled.img`
-    width: 130px;
+    width: 110px;
+    height: 40px;
     outline: none;
     @media screen and (max-width: 768px) {
         width: 100px;
@@ -36,13 +37,14 @@ export const Input = styled.input`
     outline: none;
     border: none;
     width: 100%;
-    padding: 10px;
+    padding: 6px;
     padding-left: 15px;
     font-weight: 500;
     color: #0290bf;
     cursor: pointer;
     font-size: 16px;
     background-color: transparent;
+    font-family: monospace;
 `
 export const LogoutButton = styled.button`
     background-color: #e3404b;
@@ -55,6 +57,7 @@ export const LogoutButton = styled.button`
     padding: 10px;
     width: 120px;
     font-size: 15px;
+    font-family: monospace;
 `
 export const ActionsContainer = styled.div`
   display: flex;

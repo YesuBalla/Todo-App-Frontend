@@ -52,7 +52,7 @@ class LoginForm extends Component {
     event.preventDefault()
     const {email, password} = this.state
     const userDetails = {email, password}
-    const loginUrl = 'http://localhost:8080/login'
+    const loginUrl = 'https://todo-app-backend-2zeu.onrender.com/login'
     const options = {
       method: 'POST',
       headers: {

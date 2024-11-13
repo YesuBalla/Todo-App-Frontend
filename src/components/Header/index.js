@@ -30,8 +30,9 @@ const Header = (props) => {
         };
 
         const onClickLogout = () => {
+          console.log('logout');
           const { history } = props;
-          Cookies.remove('jwtToken');
+          Cookies.remove('jwt_token');
           history.replace('/login');
         };
 
@@ -55,10 +56,12 @@ const Header = (props) => {
                   <BsMoon size={25} />
                 )}
               </ThemeButton>
-              <ProfileImage
-                src="https://assets.ccbp.in/frontend/react-js/nxt-watch-profile-img.png"
-                alt="profile"
-              />
+              <LinkItem to="/profile">
+                <ProfileImage
+                  src="https://assets.ccbp.in/frontend/react-js/nxt-watch-profile-img.png"
+                  alt="profile"
+                />
+              </LinkItem>
               <LogoutButton
                 type="button"
                 onClick={onClickLogout}

@@ -1,170 +1,129 @@
-import React from 'react';
-import { withRouter } from 'react-router-dom';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-const FormContainer = styled.div`
-  font-family: Arial, sans-serif;
-  padding: 20px;
-`;
+import './index.css'
 
-const FormTitle = styled.h1`
-  color: #333;
-`;
+const TodoForm = ({ onAddTodo, todoToEdit, onUpdateTodo, onCancel }) => {
+  const [title, setTitle] = useState('');
+  const [status, setStatus] = useState('pending');
+  const [priority, setPriority] = useState('Medium');
+  const [category, setCategory] = useState('');
 
-const FormGroup = styled.div`
-  margin-bottom: 15px;
-`;
-
-const FormLabel = styled.label`
-  display: block;
-  margin-bottom: 5px;
-`;
-
-const FormInput = styled.input`
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-`;
-
-const FormSelect = styled.select`
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-`;
-
-const FormButton = styled.button`
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-class TodoForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      todo: '',
-      priority: 'LOW',
-      status: 'TO DO',
-      category: 'WORK',
-      dueDate: ''
-    };
-  }
-
-  componentDidMount() {
-    const { id } = this.props.match.params;
-    if (id) {
-      fetch(`/todos/${id}/`)
-        .then(response => response.json())
-        .then(data => this.setState({
-          todo: data.todo,
-          priority: data.priority,
-          status: data.status,
-          category: data.category,
-          dueDate: data.dueDate
-        }))
-        .catch(error => console.error('Error fetching todo:', error));
+  useEffect(() => {
+    if (todoToEdit) {
+      setTitle(todoToEdit.title || '');
+      setStatus(todoToEdit.status || 'pending');
+      setPriority(todoToEdit.priority || 'Medium');
+      setCategory(todoToEdit.category || '');
     }
-  }
+  }, [todoToEdit]);
 
-  handleChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
+  // Handle form submission
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (title.trim() === '') {
+      alert('Title is required!');
+      return;
+    }
+
+    const todo = {
+      id: uuidv4(),
+      title,
+      status,
+      priority,
+      category,
+    };
+
+    if (todoToEdit) {
+      onUpdateTodo(todoToEdit.id, todo);
+    } else {
+      onAddTodo(todo);
+    }
+    // Reset form fields
+    resetForm();;
   };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { todo, priority, status, category, dueDate } = this.state;
-    const { id } = this.props.match.params;
-
-    const url = id ? `/todos/${id}/` : '/todos/';
-    const method = id ? 'PUT' : 'POST';
-    const body = JSON.stringify({ todo, priority, status, category, dueDate });
-
-    fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body
-    })
-      .then(() => this.props.history.push('/'))
-      .catch(error => console.error('Error submitting todo:', error));
+  const handleCancel = () => {
+    // Reset form fields when cancel is triggered
+    resetForm();
+    if (onCancel) onCancel();
   };
 
-  render() {
-    const { todo, priority, status, category, dueDate } = this.state;
-    return (
-      <FormContainer>
-        <FormTitle>{this.props.match.params.id ? 'Edit Todo' : 'Add New Todo'}</FormTitle>
-        <form onSubmit={this.handleSubmit}>
-          <FormGroup>
-            <FormLabel>Todo</FormLabel>
-            <FormInput
-              type="text"
-              name="todo"
-              value={todo}
-              onChange={this.handleChange}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <FormLabel>Priority</FormLabel>
-            <FormSelect
-              name="priority"
-              value={priority}
-              onChange={this.handleChange}
-            >
-              <option value="HIGH">High</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="LOW">Low</option>
-            </FormSelect>
-          </FormGroup>
-          <FormGroup>
-            <FormLabel>Status</FormLabel>
-            <FormSelect
-              name="status"
-              value={status}
-              onChange={this.handleChange}
-            >
-              <option value="TO DO">To Do</option>
-              <option value="IN PROGRESS">In Progress</option>
-              <option value="DONE">Done</option>
-            </FormSelect>
-          </FormGroup>
-          <FormGroup>
-            <FormLabel>Category</FormLabel>
-            <FormSelect
-              name="category"
-              value={category}
-              onChange={this.handleChange}
-            >
-              <option value="WORK">Work</option>
-              <option value="HOME">Home</option>
-              <option value="LEARNING">Learning</option>
-            </FormSelect>
-          </FormGroup>
-          <FormGroup>
-            <FormLabel>Due Date</FormLabel>
-            <FormInput
-              type="date"
-              name="dueDate"
-              value={dueDate}
-              onChange={this.handleChange}
-            />
-          </FormGroup>
-          <FormButton type="submit">
-            {this.props.match.params.id ? 'Update Todo' : 'Add Todo'}
-          </FormButton>
-        </form>
-      </FormContainer>
-    );
-  }
-}
+  const resetForm = () => {
+    setTitle('');
+    setStatus('pending');
+    setPriority('Medium');
+    setCategory('');
+  };
 
-export default withRouter(TodoForm);
+  return (
+    <form className="todo-form" onSubmit={handleSubmit}>
+      {/* Title Input */}
+      <div className="title-form-group">
+        <label className='title-label' htmlFor="title">Todo Title</label>
+        <input
+          type="text"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter todo title"
+          required
+          className='input-field'
+        />
+      </div>
+      <div className='todo-details-container'>
+        {/* Status Dropdown */}
+        <div className="form-group">
+          <label className='label-text' htmlFor="status">Status</label>
+          <select
+            id="status"
+            value={status}
+            className='select-input'
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="pending">Pending</option>
+            <option value="in progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        {/* Priority Dropdown */}
+        <div className="form-group">
+          <label className='label-text' htmlFor="priority">Priority</label>
+          <select
+            id="priority"
+            value={priority}
+            className='select-input'
+            onChange={(e) => setPriority(e.target.value)}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+
+        {/* Category Input */}
+        <div className="form-group">
+          <label className='label-text' htmlFor="category">Category</label>
+          <input
+            type="text"
+            id="category"
+            className='select-input'
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="Enter todo category"
+          />
+        </div>
+      </div>
+      <div className='buttons-container'>
+        {/* Submit and Cancel Buttons */}
+        <button className='add-todo-button' type="submit">{todoToEdit ? 'Update Todo' : 'Add Todo'}</button>
+        { onCancel && todoToEdit && (<button className='cancel-button' type="button" onClick={handleCancel}>Cancel</button>)}
+      </div>
+    </form>
+  );
+};
+
+export default TodoForm;
